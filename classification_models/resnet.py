@@ -188,12 +188,12 @@ def conv_block_bottleneck(
 ###############################################################################
 # Architecture parts.
 ###############################################################################
-def bottom_block(initial_filters: int = 64):
+def stem_block(initial_filters: int = 64):
     """Initial resnet block, common to all architectures."""
     bn_params_no_scale = _default_bn_params(scale=False)
     bn_params = _default_bn_params()
     cv_params = _default_conv_params()
-    names = BlockLayerNames(base="bottom")
+    names = BlockLayerNames(base="stem")
 
     def layer(input_tensor: tf.Tensor):
         x = layers.BatchNormalization(name=names.bn + "input", **bn_params_no_scale)(input_tensor)
@@ -283,13 +283,13 @@ def resnet(
         include_top: Whether or not to include the fully connected layer at the
             top of the network.
         n_classes: Optional number of classes to classify images into. To be
-            provided only if `include_top` is `True.`
+            provided only if `include_top` is `True`.
     """
     # Set model input.
     model_input = _set_input(input_shape, input_tensor)
 
     # Build model.
-    x = bottom_block()(model_input)
+    x = stem_block()(model_input)
     x = body_blocks(subtype)(x)
     x = top_block(include_top, n_classes)(x)
 
