@@ -460,7 +460,7 @@ def body_blocks(
                 x = mb_block(
                     activation=activation,
                     drop_rate=drop_connect_rate * cnt_reps / tot_reps,
-                    base_name=f"{base_name}_{block_idx}{chr(rep + 97)}",
+                    base_name=f"{base_name}_{block_idx + 1}{chr(rep + 97)}",
                     filters_in=block["filters_in"],
                     filters_out=block["filters_out"],
                     kernel_size=block["kernel_size"],
@@ -469,7 +469,7 @@ def body_blocks(
                     se_ratio=block["se_ratio"],
                     id_skip=block["id_skip"],
                 )(x)
-                print(f"{base_name}_{block_idx}{chr(rep + 97)}")
+                print(f"{base_name}_{block_idx + 1}{chr(rep + 97)}")
                 cnt_reps += 1
 
         return x
