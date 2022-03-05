@@ -1,0 +1,4 @@
+attrs
+# Tensorflow has to be twiked to get pylance autocompletion, see:
+# https://github.com/microsoft/pylance-release/issues/1066#issuecomment-1022431087
+tensorflow >= 2.7.0

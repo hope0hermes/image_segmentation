@@ -4,8 +4,11 @@ from dataclasses import dataclass
 from typing import Tuple, Optional, Union, Callable, Iterable, Dict
 
 import tensorflow as tf
-import tensorflow.keras as keras
-import tensorflow.keras.layers as layers
+
+
+# These aliases are just a workaround to get pylance autocompletion :-/.
+keras = tf.keras
+layers = tf.keras.layers
 
 
 ###############################################################################
@@ -85,7 +88,7 @@ class BlockLayerNames:
 
 
 def _set_input(
-    input_shape: Optional[Tuple[int, int, int]] = None,
+    input_shape: Optional[Tuple[int, ...]] = None,
     input_tensor: tf.Tensor = None,
 ) -> tf.Tensor:
     """
@@ -106,7 +109,7 @@ def _set_input(
         input_shape = (None, None, 3)
     else:
         msn = (
-            f"`input_shape` must be a `channel-last`, tuple of 3 integers. "
+            f"`input_shape` must be a `channel-last` tuple of 3 integers. "
             f"got {input_shape} instead."
         )
         if len(input_shape) != 3:
@@ -172,7 +175,9 @@ def round_repeats(repeats: int, depth_coef: float) -> int:
     return int(math.ceil(depth_coef * repeats))
 
 
-def correct_pad(inputs: tf.Tensor, kernel_size: int) -> Tuple[Tuple[int]]:
+def correct_pad(
+    inputs: tf.Tensor, kernel_size: Union[Tuple[int, int], int]
+) -> Tuple[Tuple[int, ...], ...]:
     """
     Returns a tuple for zero-padding for 2D convolution with downsampling.
 
@@ -557,7 +562,7 @@ def efficientnet(
     activation: Union[KerasActivation, str] = "swish",
     classifier_activation: Union[KerasActivation, str] = "softmax",
     normalize_input: bool = False,
-) -> keras.Model:
+) -> tf.keras.Model:
     """
     Arguments:
         subtype: Architecture subtype. Supported subtypes are "efficientnet_BX"
@@ -630,5 +635,4 @@ def efficientnet(
         n_classes=n_classes,
     )(x)
 
-
-    return keras.Model(inputs=model_input, outputs=x)
+    return keras.Model(inputs=model_input, outputs=x, name=subtype)

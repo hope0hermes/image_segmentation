@@ -2,8 +2,11 @@ from dataclasses import dataclass
 from typing import Tuple, Optional
 
 import tensorflow as tf
-import tensorflow.keras as keras
-import tensorflow.keras.layers as layers
+
+
+# These aliases are just a workaround to get pylance autocompletion :-/.
+keras = tf.keras
+layers = tf.keras.layers
 
 
 ###############################################################################
@@ -57,7 +60,7 @@ def _get_subtype(subtype: str):
         raise ValueError(msn)
 
 
-def _set_input(input_shape: Tuple[int, ...], input_tensor: tf.Tensor):
+def _set_input(input_shape: Optional[Tuple[int, ...]], input_tensor: tf.Tensor):
     """
     Setup model's input depending on if a shape tuple or an input tensor are
     passed as input arguments.
@@ -197,12 +200,10 @@ def stem_block(initial_filters: int = 64):
 
     def layer(input_tensor: tf.Tensor):
         x = layers.BatchNormalization(name=names.bn + "input", **bn_params_no_scale)(input_tensor)
-        x = layers.Conv2D(initial_filters, (7, 7), (2, 2), name=names.conv + "1", **cv_params)(x)
+        x = layers.Conv2D(initial_filters, 7, 2, name=names.conv + "1", **cv_params)(x)
         x = layers.BatchNormalization(name=names.bn + "1", **bn_params)(x)
         x = layers.Activation("relu", name=names.relu + "1")(x)
-        x = layers.MaxPooling2D(
-            (3, 3), strides=(2, 2), padding="same", name=names.pool + "1"
-        )(x)
+        x = layers.MaxPooling2D(3, 2, padding="same", name=names.pool + "1")(x)
 
         return x
 
@@ -272,7 +273,7 @@ def resnet(
     input_tensor: Optional[tf.Tensor] = None,
     include_top: bool = False,
     n_classes: Optional[int] = None,
-) -> keras.Model:
+) -> tf.keras.Model:
     """
     Args:
         subtype: Architecture subtype. Supported subtypes are "resnet18",
@@ -293,4 +294,4 @@ def resnet(
     x = body_blocks(subtype)(x)
     x = top_block(include_top, n_classes)(x)
 
-    return keras.Model(inputs=model_input, outputs=x)
+    return keras.Model(inputs=model_input, outputs=x, name=subtype)
