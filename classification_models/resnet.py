@@ -117,7 +117,9 @@ def conv_block_basic(
 
     def layer(input_tensor):
         # Stack 1.
-        x = layers.BatchNormalization(name=names.bn + "1", **params_bn)(input_tensor)
+        x = layers.BatchNormalization(
+            name=names.bn + "1", **params_bn
+        )(input_tensor)
         x = layers.Activation("relu", name=names.relu + "1")(x)
 
         # Set shortcut.
@@ -135,7 +137,9 @@ def conv_block_basic(
         # Stack 2.
         x = layers.BatchNormalization(name=names.bn + "2", **params_bn)(x)
         x = layers.Activation("relu", name=names.relu + "2")(x)
-        x = layers.Conv2D(filters, (3, 3), name=names.conv + "2", **params_conv)(x)
+        x = layers.Conv2D(
+            filters, (3, 3), name=names.conv + "2", **params_conv
+        )(x)
 
         # Merge shortcut.
         x = layers.Add(name=names.add)([x, shortcut])
@@ -159,26 +163,36 @@ def conv_block_bottleneck(
 
     def layer(input_tensor):
         # Stack 1, reducing.
-        x = layers.BatchNormalization(name=names.bn + "1", **params_bn)(input_tensor)
+        x = layers.BatchNormalization(
+            name=names.bn + "1", **params_bn
+        )(input_tensor)
         x = layers.Activation("relu", name=names.relu + "1")(x)
 
         # Set shortcut.
         if clear_pass:
             shortcut = input_tensor
         else:
-            shortcut = layers.Conv2D(4 * filters, (1, 1), strides, name=names.sc, **params_conv)(x)
+            shortcut = layers.Conv2D(
+                4 * filters, (1, 1), strides, name=names.sc, **params_conv
+            )(x)
 
-        x = layers.Conv2D(filters, (1, 1), name=names.conv + "1", **params_conv)(x)
+        x = layers.Conv2D(
+            filters, (1, 1), name=names.conv + "1", **params_conv
+        )(x)
 
         # Stack 2, bottleneck.
         x = layers.BatchNormalization(name=names.bn + "2", **params_bn)(x)
         x = layers.Activation("relu", name=names.relu + "2")(x)
-        x = layers.Conv2D(filters, (3, 3), strides, name=names.conv + "2", **params_conv)(x)
+        x = layers.Conv2D(
+            filters, (3, 3), strides, name=names.conv + "2", **params_conv
+        )(x)
 
         # Stack 3, increase.
         x = layers.BatchNormalization(name=names.bn + "3", **params_bn)(x)
         x = layers.Activation("relu", name=names.relu + "3")(x)
-        x = layers.Conv2D(4 * filters, (1, 1), name=names.conv + "3", **params_conv)(x)
+        x = layers.Conv2D(
+            4 * filters, (1, 1), name=names.conv + "3", **params_conv
+        )(x)
 
         # Merge shortcut.
         x = layers.Add(name=names.add)([x, shortcut])
@@ -199,8 +213,12 @@ def stem_block(initial_filters: int = 64):
     names = BlockLayerNames(base="stem")
 
     def layer(input_tensor: tf.Tensor):
-        x = layers.BatchNormalization(name=names.bn + "input", **bn_params_no_scale)(input_tensor)
-        x = layers.Conv2D(initial_filters, 7, 2, name=names.conv + "1", **cv_params)(x)
+        x = layers.BatchNormalization(
+            name=names.bn + "input", **bn_params_no_scale
+        )(input_tensor)
+        x = layers.Conv2D(
+            initial_filters, 7, 2, name=names.conv + "1", **cv_params
+        )(x)
         x = layers.BatchNormalization(name=names.bn + "1", **bn_params)(x)
         x = layers.Activation("relu", name=names.relu + "1")(x)
         x = layers.MaxPooling2D(3, 2, padding="same", name=names.pool + "1")(x)
@@ -228,7 +246,9 @@ def body_blocks(subtype: str, initial_filters: int = 64):
                 elif block == 1:
                     x = conv_block(stage, block, filters, strides=(2, 2))(x)
                 else:
-                    x = conv_block(stage, block, filters, strides=(1, 1), clear_pass=True)(x)
+                    x = conv_block(
+                        stage, block, filters, strides=(1, 1), clear_pass=True
+                    )(x)
 
         params_bn = _default_bn_params()
         names = BlockLayerNames(f"stage_{stage}_block_{block + 1}")

@@ -97,24 +97,23 @@ def conv_norm_act(
     padding: str = "same",
     name: str = "",
 ):
-    with tf.name_scope("conv_norm_act"):
-        def layer(input_tensor):
-            x = tf.keras.layers.Conv2D(
-                filters=filters,
-                kernel_size=kernel_size,
-                padding=padding,
-                kernel_initializer=kernel_initializer,
-                name=name + "_conv",
-            )(input_tensor)
+    def layer(input_tensor):
+        x = tf.keras.layers.Conv2D(
+            filters=filters,
+            kernel_size=kernel_size,
+            padding=padding,
+            kernel_initializer=kernel_initializer,
+            name=name + "_conv",
+        )(input_tensor)
 
-            if use_bachnorm:
-                x = tf.keras.layers.BatchNormalization(name=name + "_bn")(x)
+        if use_bachnorm:
+            x = tf.keras.layers.BatchNormalization(name=name + "_bn")(x)
 
-            x = tf.keras.layers.Activation(activation, name=name + "_act")(x)
+        x = tf.keras.layers.Activation(activation, name=name + "_act")(x)
 
-            return x
+        return x
 
-        return layer
+    return layer
 
 
 def decoder_upsample_block(filters: int, up_rate: int, use_batchnorm: bool, name: str):
@@ -249,6 +248,7 @@ def unet(
         f"graph_unet_{backbone_name}.png",
         show_shapes=True,
         expand_nested=False,
+        name=f"unet_{backbone_name}"
     )
 
     return model
@@ -259,7 +259,7 @@ def unet(
 ###############################################################################
 def main():
     backbone_name = "efficientnet_B0"
-    backbone_name = "resnet18"
+    # backbone_name = "resnet18"
     shape = (224, 224, 3)
     model = unet(
         backbone_name=backbone_name,

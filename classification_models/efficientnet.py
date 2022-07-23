@@ -201,8 +201,10 @@ def correct_pad(
 
     correct = (kernel_size[0] // 2, kernel_size[1] // 2)
 
-    return ((correct[0] - adjust[0], correct[0]),
-            (correct[1] - adjust[1], correct[1]))
+    return (
+        (correct[0] - adjust[0], correct[0]),
+        (correct[1] - adjust[1], correct[1]),
+    )
 
 
 ###############################################################################
@@ -451,8 +453,12 @@ def body_blocks(
             block = deepcopy(block)
 
             # Update width and depth based on scaling coefficients.
-            block["filters_in"] = round_filters(block["filters_in"], width_coef, divisor)
-            block["filters_out"] = round_filters(block["filters_out"], width_coef, divisor)
+            block["filters_in"] = round_filters(
+                block["filters_in"], width_coef, divisor
+            )
+            block["filters_out"] = round_filters(
+                block["filters_out"], width_coef, divisor
+            )
             block["repeats"] = round_repeats(block["repeats"], depth_coef)
 
             for rep in range(block["repeats"]):
